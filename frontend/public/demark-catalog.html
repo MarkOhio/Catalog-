@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeMark TV's Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            fill: #333;
+            transition: fill 0.3s;
+        }
+
+        .nav-icon:hover {
+            fill: #3498db;
+        }
+
+        .cart-badge {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: #fff;
+            z-index: 999;
+            transition: left 0.3s;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding-top: 80px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background: #f8f9fa;
+            color: #3498db;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+        }
+
+        /* Landing Section */
+        .landing {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .landing-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .landing-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            background: #fff;
+            color: #667eea;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Marketplace Section */
+        .marketplace {
+            padding: 4rem 0;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .category-section {
+            margin-bottom: 4rem;
+        }
+
+        .category-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 1px solid #f0f0f0;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .product-description {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        /* Cart Panel */
+        .cart-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: #fff;
+            z-index: 1001;
+            transition: right 0.3s;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .cart-panel.active {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .cart-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-price {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .quantity-btn:hover {
+            background: #2980b9;
+        }
+
+        .cart-total {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #eee;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background: #229954;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .cart-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .landing-content h1 {
+                font-size: 2rem;
+            }
+
+            .landing-content p {
+                font-size: 1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            .nav-container {
+                padding: 0 0.5rem;
+            }
+
+            .landing-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .category-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="hamburger" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <a href="#" class="brand" onclick="scrollToSection('landing')">DeMark</a>
+            <div class="nav-icons">
+                <svg class="nav-icon" onclick="scrollToSection('landing')" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <svg class="nav-icon" onclick="openWhatsApp()" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                <div class="cart-badge" onclick="toggleCart()">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="scrollToSection('landing'); toggleSidebar();">Home</a></li>
+            <li><a href="#" onclick="scrollToSection('shoes'); toggleSidebar();">Shoes</a></li>
+            <li><a href="#" onclick="scrollToSection('bags'); toggleSidebar();">Bags</a></li>
+            <li><a href="#" onclick="scrollToSection('belts'); toggleSidebar();">Belts</a></li>
+            <li><a href="#" onclick="scrollToSection('accessories'); toggleSidebar();">Accessories</a></li>
+            <li><a href="#" onclick="scrollToSection('watches'); toggleSidebar();">Watches</a></li>
+        </ul>
+    </div>
+
+    <!-- Cart Panel -->
+    <div class="cart-panel">
+        <div class="cart-header">
+            <h3 class="cart-title">Shopping Cart</h3>
+            <button class="cart-close" onclick="toggleCart()">&times;</button>
+        </div>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <div class="total-amount">Total: ₦<span id="totalAmount">0</span></div>
+            <button class="checkout-btn" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Landing Section -->
+        <section class="landing" id="landing">
+            <div class="landing-content">
+                <h1>Welcome to DeMark TV's catalog</h1>
+                <p>Let's help you get the product of your dreams.</p>
+                <button class="cta-button" onclick="scrollToSection('marketplace')">Enter Marketplace</button>
+            </div>
+        </section>
+
+        <!-- Marketplace Section -->
+        <section class="marketplace" id="marketplace">
+            <div class="container">
+                <h2 class="section-title">Marketplace</h2>
+                
+                <!-- Dynamic product sections will be inserted here -->
+                <div id="productSections"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Product Data
+        const products = {
+            shoes: [
+                {
+                    id: 1,
+                    name: "Nike Air Max 270",
+                    description: "Comfortable running shoes with excellent cushioning and modern design",
+                    price: 35000,
+                    buyLink: "https://paystack.com/pay/nike-air-max"
+                },
+                {
+                    id: 2,
+                    name: "Adidas Ultraboost 22",
+                    description: "Premium athletic footwear with responsive boost technology",
+                    price: 42000,
+                    buyLink: "https://paystack.com/pay/adidas-ultraboost"
+                },
+                {
+                    id: 3,
+                    name: "Converse Chuck Taylor",
+                    description: "Classic canvas sneakers perfect for casual wear",
+                    price: 15000,
+                    buyLink: "https://paystack.com/pay/converse-chuck"
+                }
+            ],
+            bags: [
+                {
+                    id: 4,
+                    name: "Gucci Dionysus Bag",
+                    description: "Made with Italian leather and distinctive GG Supreme canvas",
+                    price: 85000,
+                    buyLink: "https://paystack.com/pay/gucci-dionysus"
+                },
+                {
+                    id: 5,
+                    name: "Louis Vuitton Speedy",
+                    description: "Iconic monogram canvas handbag with leather trim",
+                    price: 120000,
+                    buyLink: "https://paystack.com/pay/lv-speedy"
+                },
+                {
+                    id: 6,
+                    name: "Chanel Classic Flap",
+                    description: "Timeless quilted leather bag with chain strap",
+                    price: 150000,
+                    buyLink: "https://paystack.com/pay/chanel-flap"
+                }
+            ],
+            belts: [
+                {
+                    id: 7,
+                    name: "Hermès H Belt",
+                    description: "Premium leather belt with iconic H buckle",
+                    price: 65000,
+                    buyLink: "https://paystack.com/pay/hermes-belt"
+                },
+                {
+                    id: 8,
+                    name: "Gucci GG Belt",
+                    description: "Signature GG buckle with smooth leather strap",
+                    price: 45000,
+                    buyLink: "https://paystack.com/pay/gucci-belt"
+                },
+                {
+                    id: 9,
+                    name: "Louis Vuitton Damier Belt",
+                    description: "Classic damier canvas with gold buckle",
+                    price: 55000,
+                    buyLink: "https://paystack.com/pay/lv-belt"
+                }
+            ],
+            accessories: [
+                {
+                    id: 10,
+                    name: "Ray-Ban Aviator",
+                    description: "Classic aviator sunglasses with UV protection",
+                    price: 25000,
+                    buyLink: "https://paystack.com/pay/rayban-aviator"
+                },
+                {
+                    id: 11,
+                    name: "Tiffany & Co. Necklace",
+                    description: "Sterling silver necklace with heart pendant",
+                    price: 75000,
+                    buyLink: "https://paystack.com/pay/tiffany-necklace"
+                },
+                {
+                    id: 12,
+                    name: "Apple AirPods Pro",
+                    description: "Premium wireless earbuds with active noise cancellation",
+                    price: 80000,
+                    buyLink: "https://paystack.com/pay/airpods-pro"
+                }
+            ],
+            watches: [
+                {
+                    id: 13,
+                    name: "Rolex Submariner",
+                    description: "Luxury dive watch with automatic movement",
+                    price: 2500000,
+                    buyLink: "https://paystack.com/pay/rolex-submariner"
+                },
+                {
+                    id: 14,
+                    name: "Apple Watch Series 9",
+                    description: "Smart watch with health monitoring and GPS",
+                    price: 120000,
+                    buyLink: "https://paystack.com/pay/apple-watch"
+                },
+                {
+                    id: 15,
+                    name: "Casio G-Shock",
+                    description: "Durable sports watch with multiple functions",
+                    price: 35000,
+                    buyLink: "https://paystack.com/pay/casio-gshock"
+                }
+            ]
+        };
+
+        // Cart Management
+        let cart = JSON.parse(localStorage.getItem('demarkCart')) || [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProducts();
+            updateCartUI();
+        });
+
+        // Render products dynamically
+        function renderProducts() {
+            const productSections = document.getElementById('productSections');
+            productSections.innerHTML = '';
+
+            for (const [category, items] of Object.entries(products)) {
+                const categorySection = document.createElement('div');
+                categorySection.className = 'category-section';
+                categorySection.id = category;
+
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+
+                const productsGrid = document.createElement('div');
+                productsGrid.className = 'products-grid';
+
+                items.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-price">₦${product.price.toLocaleString()}</div>
+                        <div class="product-actions">
+                            <a href="${product.buyLink}" class="btn btn-primary" target="_blank">Buy Now</a>
+                            <button class="btn btn-secondary" onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    `;
+                    productsGrid.appendChild(productCard);
+                });
+
+                categorySection.appendChild(categoryTitle);
+                categorySection.appendChild(productsGrid);
+                productSections.appendChild(categorySection);
+            }
+        }
+
+        // Navigation Functions
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            const hamburger = document.querySelector('.hamburger');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function openWhatsApp() {
+            const message = encodeURIComponent("Hi, I'm interested in a product from DeMark TV's catalog.");
+            const whatsappUrl = `https://wa.me/+2348123456789?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Cart Functions
+        function toggleCart() {
+            const cartPanel = document.querySelector('.cart-panel');
+            cartPanel.classList.toggle('active');
+        }
+
+        function addToCart(productId) {
+            const product = findProductById(productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartUI();
+            saveCart();
+            showAddedToCartAnimation();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+            saveCart();
+        }
+
+        function updateQuantity(productId, newQuantity) {
+            if (newQuantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity = newQuantity;
+                updateCartUI();
+                saveCart();
+            }
+        }
+
+        function updateCartUI() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const totalAmount = document.getElementById('totalAmount');
+
+            // Update cart count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                totalAmount.textContent = '0';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">₦${item.price.toLocaleString()}</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalAmount.textContent = total.toLocaleString();
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            // Generate order summary
+            const orderSummary = cart.map(item => 
+                `${item.name} x${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`
+            ).join('\n');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const message = `Order Summary:\n${orderSummary}\n\nTotal: ₦${total.toLocaleString()}`;
+
+            // Open WhatsApp with order details
+            const whatsappMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/+2348123456789?text=${whatsappMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Helper Functions
+        function findProductById(productId) {
+            for (const category of Object.values(products)) {
+                const product = category.find(p => p.id === productId);
+                if (product) return product;
+            }
+            return null;
+        }
+
+        function saveCart() {
+            localStorage.setItem('demarkCart', JSON.stringify(cart));
+        }
+
+        function showAddedToCartAnimation() {
+            const cartIcon = document.querySelector('.cart-badge');
+            cartIcon.style.animation = 'none';
+            setTimeout(() => {
+                cartIcon.style.animation = 'fadeInUp 0.5s ease-out';
+            }, 10);
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            if (!sidebar.contains(event.target) && !hamburger.contains(event.target) && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
+
+        // Close cart when clicking outside
+        document.addEventListener('click', function(event) {
+            const cartPanel = document.querySelector('.cart-panel');
+            const cartIcon = document.querySelector('.cart-badge');
+
+            if (!cartPanel.contains(event.target) && !cartIcon.contains(event.target) && cartPanel.classList.contains('active')) {
+                toggleCart();
+            }
+        });
+    </script>
+</body>
+</html>
